@@ -1,0 +1,6 @@
+[package]
+name = "atomic_utilities"
+version = "0.1.0"
+authors = ["Samuel Schetterer <samschet@gmail.com>"]
+
+[dependencies]

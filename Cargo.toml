@@ -4,5 +4,7 @@ version = "0.1.0"
 authors = ["Samuel Schetterer <samschet@gmail.com>"]
 description = "Basic utilities for fast atomics on multiple platforms"
 license = "MIT"
+build = "build.rs"
 
-[dependencies]
+[build-dependencies]
+rustc_version = "0.1.4"

@@ -6,16 +6,15 @@ use std::sync::atomic::Ordering;
 /// # Example:
 /// ```
 /// use std::sync::atomic::{AtomicUsize, fence};
-/// use fence_rmw::{RMWOrder, fence_rmw()};
+/// use fence_rmw::{RMWOrder, fence_rmw};
 /// let atomic_refcnt = AtomicUsize::new(0);
 /// atomic_refcnt.fetch_add(1, RMWOrder);
-/// 
+///
 /// // ... do work here
 /// // This will be ordered after the store of the fetch_add
 /// // and will use minimal fences for various hardware platforms
 /// atomic_refcnt.fetch_sub(1, Ordering::Release);
 /// ```
-
 #[cfg(any(target_platform = "x86", target_platform = "x86_64"))]
 mod internal_ordering {
     use std::sync::atomic::Ordering;
@@ -29,11 +28,15 @@ mod internal_ordering {
 mod internal_ordering {
     use std::sync::atomic::{Ordering, fence};
     pub const RMW_O: Ordering = Ordering::Relaxed;
-    pub fn the_fence() {fence(Ordering::SeqCst)}
+    pub fn the_fence() {
+        fence(Ordering::SeqCst)
+    }
 }
 
 #[allow(non_upper_case_globals)]
 pub const RMWOrder: Ordering = internal_ordering::RMW_O;
 
 #[inline(always)]
-pub fn fence_rmw() { internal_ordering::the_fence() }
+pub fn fence_rmw() {
+    internal_ordering::the_fence()
+}

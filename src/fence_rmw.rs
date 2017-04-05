@@ -1,20 +1,21 @@
-use std::sync::atomic::Ordering;
+//! This mod provides orderings to use with RMW operations
+//! that optimally handle the case when all loads and stores
+//! after an RMW operation must be ordered after the operation.
+//! # Example:
+//! ```
+//! use std::sync::atomic::{AtomicUsize, fence, Ordering};
+//! use atomic_utilities::fence_rmw::{RMWOrder, fence_rmw};
+//!
+//! let atomic_refcnt = AtomicUsize::new(0);
+//! atomic_refcnt.fetch_add(1, RMWOrder);
+//!
+//! // ... do work here
+//! // This will be ordered after the store of the fetch_add
+//! // and will use minimal fences for various hardware platforms
+//! atomic_refcnt.fetch_sub(1, Ordering::Release);
+//! ```
 
-/// This mod provides orderings to use with RMW operations
-/// that optimally handle the case when all loads and stores
-/// after an RMW operation must be ordered after the operation.
-/// # Example:
-/// ```
-/// use std::sync::atomic::{AtomicUsize, fence};
-/// use fence_rmw::{RMWOrder, fence_rmw};
-/// let atomic_refcnt = AtomicUsize::new(0);
-/// atomic_refcnt.fetch_add(1, RMWOrder);
-///
-/// // ... do work here
-/// // This will be ordered after the store of the fetch_add
-/// // and will use minimal fences for various hardware platforms
-/// atomic_refcnt.fetch_sub(1, Ordering::Release);
-/// ```
+use std::sync::atomic::Ordering;
 #[cfg(any(target_platform = "x86", target_platform = "x86_64"))]
 mod internal_ordering {
     use std::sync::atomic::Ordering;
@@ -33,9 +34,11 @@ mod internal_ordering {
     }
 }
 
+/// The ordering to be used for RMW operations in this fencing scheme
 #[allow(non_upper_case_globals)]
 pub const RMWOrder: Ordering = internal_ordering::RMW_O;
 
+/// The fence to be used after the RMW
 #[inline(always)]
 pub fn fence_rmw() {
     internal_ordering::the_fence()

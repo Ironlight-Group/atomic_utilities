@@ -53,6 +53,11 @@ mod artificial_dep_inner {
     pub fn false_dep<T>(myref: &T, _v: usize) -> &T {
         myref
     }
+
+    #[inline(always)]
+    pub fn false_dep_mut<T>(myref: &mut T, _v: usize) -> &mut T {
+        myref
+    }
 }
 
 #[cfg(all(any(target_arch = "arm", target_arch = "aarch64"),
@@ -63,6 +68,17 @@ mod artificial_dep_inner {
 
     #[inline(always)]
     pub fn false_dep<T>(mut myref: &T, val: usize) -> &T {
+        unsafe {
+            asm!("eor $0, $0, $1
+              eor $0, $0, $1"
+              : "+r" (myref)
+              : "r" (val));
+            myref
+        }
+    }
+
+    #[inline(always)]
+    pub fn false_dep<T>(mut myref: &mut T, val: usize) -> &mut T {
         unsafe {
             asm!("eor $0, $0, $1
               eor $0, $0, $1"
@@ -98,4 +114,9 @@ pub const DepOrd: Ordering = artificial_dep_inner::DEPORD;
 #[inline(always)]
 pub fn dependently<T, R, F: FnOnce(&T) -> R>(val: usize, myref: &T, myfn: F) -> R {
     myfn(artificial_dep_inner::false_dep(myref, val))
+}
+
+#[inline(always)]
+pub fn dependently_mut<T, R, F: FnOnce(&mut T) -> R>(val: usize, myref: &mut T, myfn: F) -> R {
+    myfn(artificial_dep_inner::false_dep_mut(myref, val))
 }

@@ -1,6 +1,6 @@
 [package]
 name = "atomic_utilities"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Samuel Schetterer <samschet@gmail.com>"]
 description = "Basic utilities for fast atomics on multiple platforms"
 license = "MIT"

@@ -78,7 +78,7 @@ mod artificial_dep_inner {
     }
 
     #[inline(always)]
-    pub fn false_dep<T>(mut myref: &mut T, val: usize) -> &mut T {
+    pub fn false_dep_mut<T>(mut myref: &mut T, val: usize) -> &mut T {
         unsafe {
             asm!("eor $0, $0, $1
               eor $0, $0, $1"
